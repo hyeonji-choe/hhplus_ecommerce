@@ -14,3 +14,7 @@
   <p>https://lucid.app/folder/invitations/accept/inv_62edb212-2770-4467-a19a-aca1b6f3f2b9</p>
 </div>
 
+
+## How to run Mockserver
+
+`./gradlew :api-mockserver:run`
