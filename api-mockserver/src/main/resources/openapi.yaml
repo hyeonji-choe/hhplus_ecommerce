@@ -1,0 +1,528 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: Ecommerce
+tags:
+  - name: user
+    description: 사용자 관리
+  - name: asset
+    description: 사용자의 자산조회 및 충전관리
+  - name: coupon
+    description: 사용자의 쿠폰리스트 및 발급관리
+  - name: product
+    description: 상품 등록 및 조회 관리
+  - name: order
+    description: 주문정보 조회 및 주문생성 관리
+paths:
+  '/coupons':
+    get:
+      tags:
+        - coupon
+      summary: 쿠폰리스트를 조회함.
+      operationId: searchCoupons
+      responses:
+        '200':
+          description: 쿠폰 리스트
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CouponInfo'
+        '400':
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/coupons/{id}':
+    get:
+      tags:
+        - coupon
+      summary: 유저가 소유한 쿠폰리스트를 조회함.
+      operationId: searchCouponsByUser
+      responses:
+        '200':
+          description: 유저의 쿠폰 리스트
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CouponInfo'
+        '400':
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      parameters:
+        - schema:
+            type: number
+          name: id
+          in: path
+          required: true
+          description: 자산을조회할 user의 아이디
+  '/coupons/get/{user_id}/{coupon_id}':
+    post:
+      tags:
+        - coupon
+      summary: user아이디로 쿠폰 발급 신청.
+      operationId: getCouponByUser
+      responses:
+        '200':
+          description: 발급성공한 쿠폰의 정보
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegistCouponResult'
+        '400':
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      parameters:
+        - schema:
+            type: number
+          name: coupon_id
+          in: path
+          required: true
+          description: 쿠폰발급할 쿠폰의 아이디
+        - schema:
+            type: number
+          name: user_id
+          in: path
+          required: true
+          description: 쿠폰발급할 user의 아이디
+  '/asset/{id}':
+    get:
+      tags:
+        - asset
+      summary: 유저의 자산을 조회함.
+      operationId: searchAssetByUser
+      responses:
+        '200':
+          description: 유저의 총자산 양
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Asset'
+        '400':
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      parameters:
+        - schema:
+            type: number
+          name: id
+          in: path
+          required: true
+          description: 자산을조회할 user의 아이디
+  '/asset/charge/{id}/{amount}':
+    post:
+      tags:
+        - asset
+      summary: 자산을 충전함.
+      operationId: chargeAssetByUser
+      responses:
+        '200':
+          description: 자산충전 성공한 유저의 총자산 양
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Asset'
+        '400':
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      parameters:
+        - schema:
+            type: number
+          name: id
+          in: path
+          required: true
+          description: 자산을충전할 user의 아이디
+        - schema:
+            type: number
+          name: amount
+          in: path
+          required: true
+          description: 충전할 자산의 양
+  '/products':
+    get:
+      tags:
+        - product
+      summary: 상품을 조회함.
+      operationId: searchProducts
+      parameters:
+        - schema:
+            type: number
+          name: page
+          in: query
+          required: true
+          description: 페이지네이션의 인덱스
+        - schema:
+            type: number
+          name: rowsPerPage
+          in: query
+          required: true
+          description: 페이지별 row
+      responses:
+        '200':
+          description: 조건에 맞는 상품 리스트
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        '400':
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/products/famous':
+    get:
+      tags:
+        - product
+      summary: 최근 3일간 가장 많이 팔린 상위 5개 상품을 조회함.
+      operationId: searchFamousProducts
+      parameters:
+        - schema:
+            type: string
+            example: '2025-01-02'
+          name: date
+          in: query
+          required: true
+          description: 최근 3일의 기준 날짜
+      responses:
+        '200':
+          description: 조건에 맞는 상품 리스트
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FamousProduct'
+        '400':
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/cart/regist':
+    post:
+      tags:
+        - order
+      summary: 주문하기 위한 상품을 장바구니에 담기.
+      operationId: registCartProduct
+      requestBody:
+        description: 추가할 cart의 정보
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CartRegist'
+      responses:
+        '200':
+          description: cart에 담긴 상품 리스트
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CartProduct'
+        '400':
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/cart/order/{id}':
+    post:
+      tags:
+        - order
+      summary: 장바구니에 담긴 상품을 주문.
+      operationId: orderCartProduct
+      parameters:
+        - schema:
+            type: number
+            example: 1
+          name: id
+          in: path
+          required: true
+          description: 상품주문할 user의 id
+      responses:
+        '200':
+          description: 주문완료된 상품 리스트와 결과
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderProduct'
+        '400':
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/cart/{id}':
+    get:
+      tags:
+        - order
+      summary: 장바구니에 담긴 user의 상품리스트.
+      operationId: searchCartByUser
+      parameters:
+        - schema:
+            type: number
+            example: 1
+          name: id
+          in: path
+          required: true
+          description: cart정보를 가져올 user의 id
+      responses:
+        '200':
+          description: user의 cart 리스트
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CartProduct'
+        '400':
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/user/regist/{name}':
+    post:
+      tags:
+        - user
+      summary: 새로운 유저정보 등록.
+      operationId: registUser
+      parameters:
+        - schema:
+            type: string
+            example: '새로운유저'
+          name: name
+          in: path
+          required: true
+          description: 새로 등록할 user의 이름
+      responses:
+        '200':
+          description: 등록완료된 user정보
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    User:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: number
+          example: 1
+        name:
+          type: string
+          example: '새로운유저'
+    CouponInfo:
+      type: object
+      required:
+        - id
+        - coupon_name
+        - benefit_info
+        - quantity
+      properties:
+        id:
+          type: number
+          example: 1
+        coupon_name:
+          type: string
+          example: '10%할인쿠폰'
+        benefit_info:
+          type: number
+          format: float
+          example: 0.1
+        quantity:
+          type: number
+          format: double
+          example: 100
+    RegistCouponResult:
+      type: object
+      required:
+        - id
+        - coupon_name
+        - result
+      properties:
+        id:
+          type: number
+          example: 1
+        coupon_name:
+          type: string
+          example: '10%할인쿠폰'
+        result:
+          type: string
+          example: "SUCCESS | FAILED"
+          description: '여부 실패시, additionalProperties 에 failedReason 포함됨'
+        additionalProperties:
+          additionalProperties:
+            $ref: '#/components/schemas/StringMap'
+          type: object
+          description: '추가 되어질 수 있는 내역 담기'
+    Asset:
+      type: object
+      required:
+        - id
+        - amount
+        - result
+      properties:
+        id:
+          type: number
+          example: 1
+        amount:
+          type: number
+          format: double
+          example: 10000
+        result:
+          type: string
+          example: "SUCCESS | FAILED"
+          description: '여부 실패시, additionalProperties 에 failedReason 포함됨'
+        additionalProperties:
+          additionalProperties:
+            $ref: '#/components/schemas/StringMap'
+          type: object
+          description: '추가 되어질 수 있는 내역 담기'
+    Product:
+      type: object
+      required:
+        - id
+        - product_name
+        - sale_price
+        - stocks
+      properties:
+        id:
+          type: number
+          example: 1
+        product_name:
+          type: string
+          example: '상품이름'
+        sale_price:
+          type: number
+          format: double
+          example: 1000
+        stocks:
+          type: number
+          format: int
+          example: 5
+    FamousProduct:
+      type: object
+      required:
+        - id
+        - product_name
+        - sale_price
+        - stocks
+        - sell_amount
+      properties:
+        id:
+          type: number
+          example: 1
+        product_name:
+          type: string
+          example: '상품이름'
+        sale_price:
+          type: number
+          format: double
+          example: 1000
+        stocks:
+          type: number
+          format: int
+          example: 5
+        sell_amount:
+          type: number
+          format: int
+          example: 100
+    CartRegist:
+      type: object
+      required:
+        - user_id
+        - product_id
+        - quantity
+      properties:
+        user_id:
+          type: number
+          example: 1
+        product_id:
+          type: number
+          example: 1
+        quantity:
+          type: number
+          format: int
+          example: 5
+    CartProduct:
+      type: object
+      required:
+        - id
+        - quantity
+        - added_at
+      properties:
+        id:
+          type: number
+          example: 1
+        quantity:
+          type: number
+          format: int
+          example: 5
+        added_at:
+          type: string
+          example: '2025-01-02 11:20'
+    OrderProduct:
+      type: object
+      required:
+        - id
+        - ordered_at
+        - order_list
+        - result
+      properties:
+        id:
+          type: number
+          example: 1
+        ordered_at:
+          type: string
+          example: '2025-01-02 11:20'
+        order_list:
+          type: array
+          items:
+            $ref: '#/components/schemas/CartProduct'
+        result:
+          type: string
+          example: "SUCCESS | FAILED"
+          description: '여부 실패시, additionalProperties 에 failedReason 포함됨'
+        additionalProperties:
+          additionalProperties:
+            $ref: '#/components/schemas/StringMap'
+          type: object
+          description: '추가 되어질 수 있는 내역 담기'
+    Error:
+      required:
+        - value
+      properties:
+        value:
+          type: string
+          example: 적절하지 않은 값입니다.
+    StringMap:
+      type: string
