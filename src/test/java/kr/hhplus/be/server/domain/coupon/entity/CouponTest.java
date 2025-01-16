@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.coupon.entity;
 
+import kr.hhplus.be.server.common.exception.CustomException;
 import kr.hhplus.be.server.domain.coupon.HistoryType;
 import kr.hhplus.be.server.domain.user.entity.User;
 import org.junit.jupiter.api.Test;
@@ -25,12 +26,12 @@ public class CouponTest {
 
         // Assert
         assertThat(coupon).isNotNull()
-                .extracting("name", "quantity", "discountRate")
+                .extracting("couponName", "maxIssueCount", "discountRate")
                 .containsExactly(name, quantity, discountRate);
     }
 
     @Test
-    public void 쿠폰_발급_성공시_수량1_감소() {
+    public void 쿠폰_발급_성공시_수량1_감소() throws CustomException {
         // Arrange
         long userId = 1L;
         long assetAmount = 0;

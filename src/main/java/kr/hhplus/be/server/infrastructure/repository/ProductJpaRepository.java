@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 
 public interface ProductJpaRepository extends JpaRepository<Product, Long> {
+    @Query("SELECT p FROM Product p WHERE p.id = :productId")
     Product findByProductId(Long productId);
 
     Page<Product> findAll(Pageable pageable);

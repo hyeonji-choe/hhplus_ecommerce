@@ -2,7 +2,7 @@ package kr.hhplus.be.server.domain.coupon.respository;
 
 import kr.hhplus.be.server.domain.coupon.entity.Coupon;
 import kr.hhplus.be.server.infrastructure.CouponRepositoryImpl;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -35,15 +35,16 @@ public class CouponRepositoryTest {
     @Test
     public void 쿠폰정보를_lock을_걸어_조회() {
 // given
-        Coupon coupon = Coupon.create("테스트 쿠폰", DiscountType.AMOUNT, 1000L, 1000L, 50L, LocalDateTime.now().plusDays(3));
+        Coupon coupon = Coupon.create("Test Coupon", 5, 10);
+
         Coupon savedCoupon = repository.save(coupon);
 
         // when
-        Coupon result = repository.findByCouponIdWithLock(savedCoupon.getCouponId());
+        Coupon result = repository.findByCouponIdWithLock(savedCoupon.getId());
 
         // then
         assertNotNull(result);
         assertEquals(savedCoupon.getCouponName(), result.getCouponName());
-        assertEquals(savedCoupon.getDiscountAmount(), result.getDiscountAmount());
+        assertEquals(savedCoupon.getDiscountRate(), result.getDiscountRate());
     }
 }

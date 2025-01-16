@@ -19,16 +19,14 @@ public class OrderItem extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "order_item_id", insertable = false, nullable = false)
     private Long id;
-    @Column(name = "product_id")
     private Long productId;
-    @ManyToOne
-    private Product product;
-    @Column(name = "quantity")
     private int quantity;
-    @Column(name = "order_id")
     private Long orderId;
+
     @ManyToOne
     private Order order;
+    @ManyToOne
+    private Product product;
 
     public OrderItem create(Product product, int quantity, Order order) {
         if (quantity <= 0) {
