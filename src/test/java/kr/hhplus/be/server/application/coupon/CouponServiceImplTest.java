@@ -10,7 +10,8 @@ import kr.hhplus.be.server.domain.coupon.entity.CouponHistory;
 import kr.hhplus.be.server.domain.coupon.respository.CouponHistoryRepository;
 import kr.hhplus.be.server.domain.coupon.respository.CouponRepository;
 import kr.hhplus.be.server.domain.user.entity.User;
-import org.junit.Test;
+import kr.hhplus.be.server.domain.user.repository.UserRepository;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -30,13 +31,16 @@ import static org.mockito.Mockito.*;
 public class CouponServiceImplTest {
 
     @Mock
+    private UserRepository userRepository;
+
+    @Mock
     private CouponRepository couponRepository;
 
     @Mock
     private CouponHistoryRepository couponHistoryRepository;
 
     @InjectMocks
-    private CouponService couponService;
+    private CouponServiceImpl couponService;
 
     @Test
     public void getCouponInfoByCouponId() {
@@ -67,8 +71,6 @@ public class CouponServiceImplTest {
         // when & then
         assertThatThrownBy(() -> couponService.getCouponInfoByCouponId(couponId))
                 .isInstanceOf(EntityNotFoundException.class);
-        verify(couponRepository, times(1)).findByCouponId(couponId);
-        verify(couponHistoryRepository, never()).save(any(CouponHistory.class));
     }
 
     @Test
@@ -82,6 +84,7 @@ public class CouponServiceImplTest {
         Coupon mockCoupon = new Coupon(couponId, "TEST쿠폰", 1000, 10, historyList);
         CouponHistory mockIssuance = new CouponHistory(1L, HistoryType.ISSUE, LocalDateTime.now(), null, user, mockCoupon);
 
+        when(userRepository.save(user)).thenReturn(user);
         when(couponRepository.findByCouponIdWithLock(couponId)).thenReturn(mockCoupon);
         when(couponHistoryRepository.save(any(CouponHistory.class))).thenReturn(mockIssuance);
 

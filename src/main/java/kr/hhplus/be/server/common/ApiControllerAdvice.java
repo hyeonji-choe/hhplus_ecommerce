@@ -23,9 +23,12 @@ public class ApiControllerAdvice {
         return ApiResponse.badRequest(e.getMessage());
     }
 
+    //Custom Exception
     @ExceptionHandler(CustomException.class)
     public ApiResponse<Void> handleCustomException(final CustomException e) {
         log.error(e.getMessage(), e);
         return ApiResponse.badRequest(e.getMessage());
     }
+
+
 }

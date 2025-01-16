@@ -2,7 +2,6 @@ package kr.hhplus.be.server.application.order;
 
 import jakarta.persistence.EntityNotFoundException;
 import kr.hhplus.be.server.api.model.OrderResult;
-import kr.hhplus.be.server.api.model.TopOrderProduct;
 import kr.hhplus.be.server.domain.order.entity.Order;
 import kr.hhplus.be.server.domain.order.entity.OrderItem;
 import kr.hhplus.be.server.domain.order.repository.OrderItemRepository;
@@ -77,8 +76,4 @@ public class OrderServiceImpl implements OrderService {
         return result;
     }
 
-    @Transactional(readOnly = true)
-    public List<TopOrderProduct> findTop5OrderProducts() {
-        return orderItemRepository.findTop5OrderProducts();
-    }
 }
