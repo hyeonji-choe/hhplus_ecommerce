@@ -5,9 +5,10 @@
  */
 package kr.hhplus.be.server.api;
 
-import kr.hhplus.be.server.api.model.CartProduct;
-import kr.hhplus.be.server.api.model.CartRegist;
-import kr.hhplus.be.server.api.model.OrderProduct;
+import kr.hhplus.be.server.api.model.OrderRegist;
+import kr.hhplus.be.server.api.model.OrderResult;
+import kr.hhplus.be.server.application.order.OrderServiceRequest;
+import kr.hhplus.be.server.domain.order.entity.OrderItem;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -20,48 +21,49 @@ import java.util.List;
 public interface OrderApi {
 
     /**
-     * POST /cart/order/{id} : 장바구니에 담긴 상품을 주문.
+     * POST /order/create : 장바구니에 담긴 상품을 주문.
      *
-     * @param id 상품주문할 user의 id (required)
+     * @param request order에 추가할 정보 (required)
      * @return 주문완료된 상품 리스트와 결과 (status code 200)
      * or unexpected error (status code 400)
      */
 
     @PostMapping(
-            value = "/cart/order/{id}",
-            produces = {"application/json"}
+            value = "/order/create",
+            produces = {"application/json"},
+            consumes = {"application/json"}
     )
-    ResponseEntity<OrderProduct> orderCartProduct(@PathVariable("id") Long id);
+    ResponseEntity<OrderResult> registOrder(@RequestBody OrderServiceRequest request);
 
 
     /**
-     * POST /cart/regist : 주문하기 위한 상품을 장바구니에 담기.
+     * POST /order/regist : 주문하기 위한 상품을 장바구니에 담기.
      *
-     * @param cartRegist 추가할 cart의 정보 (optional)
-     * @return cart에 담긴 상품 리스트 (status code 200)
+     * @param orderRegist 추가할 product 정보 (optional)
+     * @return order 담긴 상품 리스트 (status code 200)
      * or unexpected error (status code 400)
      */
 
     @PostMapping(
-            value = "/cart/regist",
+            value = "/order/product",
             produces = {"application/json"},
             consumes = {"application/json"}
     )
-    ResponseEntity<List<CartProduct>> registCartProduct(@RequestBody(required = false) CartRegist cartRegist);
+    ResponseEntity<List<OrderItem>> registOrderProduct(@RequestBody(required = false) OrderRegist orderRegist);
 
 
     /**
-     * GET /cart/{id} : 장바구니에 담긴 user의 상품리스트.
+     * GET /order/{id} : order의 상품리스트.
      *
-     * @param id cart정보를 가져올 user의 id (required)
-     * @return user의 cart 리스트 (status code 200)
+     * @param id order 정보를 가져올 order의 id (required)
+     * @return order 결과 (status code 200)
      * or unexpected error (status code 400)
      */
 
     @GetMapping(
-            value = "/cart/{id}",
+            value = "/order/{id}",
             produces = {"application/json"}
     )
-    ResponseEntity<List<CartProduct>> searchCartByUser(@PathVariable("id") Long id);
+    ResponseEntity<OrderResult> searchOrderByOrderId(@PathVariable("id") Long id);
 
 }
