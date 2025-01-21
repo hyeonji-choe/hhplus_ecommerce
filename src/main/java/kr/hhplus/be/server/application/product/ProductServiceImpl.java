@@ -1,8 +1,11 @@
 package kr.hhplus.be.server.application.product;
 
 import jakarta.persistence.EntityNotFoundException;
+import kr.hhplus.be.server.api.model.FamousProductResult;
 import kr.hhplus.be.server.api.model.ProductResult;
+import kr.hhplus.be.server.api.model.TopOrderProduct;
 import kr.hhplus.be.server.common.exception.CustomException;
+import kr.hhplus.be.server.domain.order.repository.OrderItemRepository;
 import kr.hhplus.be.server.domain.product.entity.Product;
 import kr.hhplus.be.server.domain.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
+    private final OrderItemRepository orderItemRepository;
 
     @Transactional(readOnly = true)
     public ProductResult getProductByProductIdWithLock(Long productId) {
@@ -49,4 +53,13 @@ public class ProductServiceImpl implements ProductService {
         return ProductResult.toResult(savedStock);
     }
 
+    @Transactional(readOnly = true)
+    public List<FamousProductResult> findTop5OrderProducts() {
+        List<TopOrderProduct> topOrderProductList = orderItemRepository.findTop5OrderProducts();
+
+        return topOrderProductList.stream().map(p -> {
+            Product product = productRepository.findByProductId(p.getProductId());
+            return FamousProductResult.toResult(product, p.getTotalQuantity());
+        }).toList();
+    }
 }

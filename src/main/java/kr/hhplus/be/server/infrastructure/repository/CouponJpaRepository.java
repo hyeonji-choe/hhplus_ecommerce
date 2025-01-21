@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 
 public interface CouponJpaRepository extends JpaRepository<Coupon, Long> {
+
+    @Query("SELECT c from Coupon c where c.id = :couponId")
     Coupon findByCouponId(Long couponId);
 
     Page<Coupon> findAll(Pageable pageable);

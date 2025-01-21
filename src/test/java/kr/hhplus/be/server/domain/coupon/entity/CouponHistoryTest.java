@@ -1,9 +1,10 @@
 package kr.hhplus.be.server.domain.coupon.entity;
 
 import kr.hhplus.be.server.common.exception.CouponErrorCode;
+import kr.hhplus.be.server.common.exception.CustomException;
 import kr.hhplus.be.server.domain.coupon.HistoryType;
 import kr.hhplus.be.server.domain.user.entity.User;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ public class CouponHistoryTest {
         CouponHistory history = new CouponHistory(HistoryType.USE, LocalDateTime.now(), user, coupon);
 
         assertThatThrownBy(history::checkCoupon)
-//                .isInstanceOf(CustomException.class)
+                .isInstanceOf(CustomException.class)
                 .hasMessage(CouponErrorCode.ALREADY_USED_COUPON.getMessage());
     }
 }

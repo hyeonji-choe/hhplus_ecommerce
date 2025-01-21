@@ -35,19 +35,18 @@ public class OrderItemRepositoryImpl implements OrderItemRepository {
 
 
     public List<TopOrderProduct> findTop5OrderProducts() {
-        QOrderItem qOrderItem = QOrderItem.orderItem;
-
+        QOrderItem orderItem = QOrderItem.orderItem;
         LocalDateTime threeDaysAgo = LocalDateTime.now().minusDays(3);
 
         return queryFactory.select(Projections.constructor(
                         TopOrderProduct.class,
-                        qOrderItem.id.as("productId"),
-                        qOrderItem.quantity.sum().as("totalQuantity")
+                        orderItem.id.as("productId"),
+                        orderItem.quantity.sum().as("totalQuantity")
                 ))
-                .from(qOrderItem)
-                .where(qOrderItem.createdAt.after(threeDaysAgo))
-                .groupBy(qOrderItem.product.id)
-                .orderBy(qOrderItem.quantity.sum().desc())
+                .from(orderItem)
+                .where(orderItem.createdAt.after(threeDaysAgo))
+                .groupBy(orderItem.product.id)
+                .orderBy(orderItem.quantity.sum().desc())
                 .limit(5)
                 .fetch();
     }

@@ -20,8 +20,7 @@ public class ProductApiController implements ProductApi {
 
     @Override
     public ResponseEntity<List<FamousProductResult>> searchFamousProducts(String date) {
-
-        return null;
+        return ResponseEntity.ok(productService.findTop5OrderProducts());
     }
 
     @Override
