@@ -19,4 +19,10 @@ public interface ProductJpaRepository extends JpaRepository<Product, Long> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT p FROM Product p WHERE p.id = :productId")
     Product findByProductIdWithLock(Long productId);
+
+    @Query(value = "select get_lock(:key, 3000)", nativeQuery = true)
+    void getLock(String key);
+
+    @Query(value = "select release_lock(:key, key)", nativeQuery = true)
+    void releaseLock(String key);
 }
