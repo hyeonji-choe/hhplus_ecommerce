@@ -3,7 +3,9 @@ package kr.hhplus.be.server.application.coupon;
 import jakarta.persistence.EntityNotFoundException;
 import kr.hhplus.be.server.api.model.CouponResult;
 import kr.hhplus.be.server.api.model.IssueCouponResult;
+import kr.hhplus.be.server.common.exception.CouponErrorCode;
 import kr.hhplus.be.server.common.exception.CustomException;
+import kr.hhplus.be.server.domain.coupon.CouponIssuer;
 import kr.hhplus.be.server.domain.coupon.HistoryType;
 import kr.hhplus.be.server.domain.coupon.entity.Coupon;
 import kr.hhplus.be.server.domain.coupon.entity.CouponHistory;
@@ -29,6 +31,7 @@ public class CouponServiceImpl implements CouponService {
     private final CouponRepository couponRepository;
     private final CouponHistoryRepository couponHistoryRepository;
     private final UserRepository userRepository;
+    private final CouponIssuer couponIssuer;
 
     @Override
     public CouponResult registerCoupon(String couponName, int quantity, int discountRate) {
@@ -67,39 +70,31 @@ public class CouponServiceImpl implements CouponService {
         Coupon coupon = couponRepository.findByCouponIdWithLock(couponId);
         if (coupon == null) throw new EntityNotFoundException("Coupon not found.");
 
-        CouponHistory couponHistory = CouponHistory.builder()
-                .user(user)
-                .coupon(coupon)
-                .issueUseDate(LocalDateTime.now())
-                .type(HistoryType.ISSUE).build();
+        Coupon issuedCoupon = couponIssuer.issue(user, coupon);
 
-        coupon.issueCoupon(couponHistory);
-        CouponHistory newHistory = couponHistoryRepository.save(couponHistory);
+        couponRepository.save(issuedCoupon);
+        CouponHistory history = couponHistoryRepository.save(CouponHistory.create(HistoryType.ISSUE, LocalDateTime.now(), userId, couponId));
 
-        return IssueCouponResult.create(newHistory.getId(), coupon.getId(), user.getId(), coupon.getCouponName(), "success");
+        return IssueCouponResult.create(history.getId(), coupon.getId(), user.getId(), coupon.getCouponName(), "success");
     }
 
     @Override
     @Transactional
-    public IssueCouponResult useUserIssuedCoupon(Long userId, Long couponId) {
+    public IssueCouponResult useUserIssuedCoupon(Long userId, Long couponId) throws CustomException {
         Coupon coupon = couponRepository.findByCouponIdWithLock(couponId);
         if (coupon == null) throw new EntityNotFoundException("Coupon not found.");
 
         User user = userRepository.findByUserIdWithLock(userId);
         if (user == null) throw new EntityNotFoundException("User not found.");
 
-        CouponHistory history = couponHistoryRepository.findByCouponIdAndUserId(couponId, userId);
+        List<CouponHistory> history = couponHistoryRepository.findByCouponIdAndUserId(couponId, userId);
         if (history == null) throw new EntityNotFoundException("Coupon history not found.");
+        if (history.stream().anyMatch(h -> h.getType().equals(HistoryType.USE)))
+            throw new CustomException(CouponErrorCode.ALREADY_USED_COUPON);
 
-        CouponHistory usedCoupon = CouponHistory.builder()
-                .coupon(coupon)
-                .issueUseDate(LocalDateTime.now())
-                .user(user)
-                .type(HistoryType.USE).build();
+        CouponHistory issuedCoupon = couponHistoryRepository.save(CouponHistory.create(HistoryType.USE, LocalDateTime.now(), userId, couponId));
 
-        CouponHistory issuedCoupon = couponHistoryRepository.save(usedCoupon);
-
-        return IssueCouponResult.toResult(issuedCoupon);
+        return IssueCouponResult.toResult(coupon, issuedCoupon);
     }
 
     @Transactional(readOnly = true)
@@ -113,7 +108,8 @@ public class CouponServiceImpl implements CouponService {
 
         return userCoupoonList.stream()
                 .map(history -> {
-                    return IssueCouponResult.toResult(history);
+                    Coupon coupon = couponRepository.findByCouponId(history.getCouponId());
+                    return IssueCouponResult.toResult(coupon, history);
                 })
                 .toList();
     }

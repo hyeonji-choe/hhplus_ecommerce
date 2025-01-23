@@ -40,12 +40,12 @@ public class OrderItemRepositoryImpl implements OrderItemRepository {
 
         return queryFactory.select(Projections.constructor(
                         TopOrderProduct.class,
-                        orderItem.id.as("productId"),
+                        orderItem.productId.as("productId"),
                         orderItem.quantity.sum().as("totalQuantity")
                 ))
                 .from(orderItem)
                 .where(orderItem.createdAt.after(threeDaysAgo))
-                .groupBy(orderItem.product.id)
+                .groupBy(orderItem.productId)
                 .orderBy(orderItem.quantity.sum().desc())
                 .limit(5)
                 .fetch();

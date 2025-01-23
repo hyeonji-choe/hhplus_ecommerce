@@ -2,13 +2,10 @@ package kr.hhplus.be.server.domain.user.entity;
 
 import jakarta.persistence.*;
 import kr.hhplus.be.server.domain.BaseEntity;
-import kr.hhplus.be.server.domain.coupon.entity.CouponHistory;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 @Getter
 @Entity
@@ -27,10 +24,6 @@ public class User extends BaseEntity {
 
     @Column(name = "asset_amount")
     private long assetAmount;
-
-    @OneToMany
-    @JoinColumn(name = "user_id")
-    private List<CouponHistory> couponHistory;
 
     public static User create(String name) {
         return User.builder()

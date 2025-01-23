@@ -7,8 +7,6 @@ import kr.hhplus.be.server.domain.user.entity.User;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -19,16 +17,15 @@ public class CouponHistoryTest {
         long userId = 1L;
         long assetAmount = 0;
         String userName = "testUser";
-        List<CouponHistory> historyList = new ArrayList<>();
-        User user = new User(userId, userName, assetAmount, historyList);
+        User user = new User(userId, userName, assetAmount);
 
         Long couponId = 1L;
         String name = "Test Coupon";
         int quantity = 5;
         int discountRate = 10;
-        Coupon coupon = new Coupon(couponId, name, quantity, discountRate, historyList);
+        Coupon coupon = new Coupon(couponId, name, quantity, quantity, discountRate);
 
-        CouponHistory history = new CouponHistory(HistoryType.USE, LocalDateTime.now(), user, coupon);
+        CouponHistory history = new CouponHistory(1L, HistoryType.USE, LocalDateTime.now(), coupon.getId(), user.getId());
 
         assertThatThrownBy(history::checkCoupon)
                 .isInstanceOf(CustomException.class)

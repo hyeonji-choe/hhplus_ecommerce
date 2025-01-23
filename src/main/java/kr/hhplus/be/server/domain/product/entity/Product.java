@@ -4,14 +4,16 @@ import jakarta.persistence.*;
 import kr.hhplus.be.server.common.exception.CustomException;
 import kr.hhplus.be.server.common.exception.ProductErrorCode;
 import kr.hhplus.be.server.domain.BaseEntity;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 @Getter
 @Entity
 @Table(name = "product")
-@ToString
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 public class Product extends BaseEntity {
     @Id
@@ -24,6 +26,14 @@ public class Product extends BaseEntity {
     private Double price;
     @Column(name = "quantity")
     private int quantity;
+
+    public static Product create(String productName, Double price, int quantity) {
+        return Product.builder()
+                .productName(productName)
+                .price(price)
+                .quantity(quantity)
+                .build();
+    }
 
     public void decreaseQuantity(Long quantity) throws CustomException {
         if (this.quantity < quantity) {

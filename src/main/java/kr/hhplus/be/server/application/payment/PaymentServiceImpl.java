@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
 
+    @Override
     @Transactional
     public PaymentResult createPayment(PaymentServiceRequest request) {
         Payment payment = request.toEntity();

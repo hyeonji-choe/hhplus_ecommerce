@@ -45,20 +45,18 @@ public class CouponServiceImplTest {
     @Test
     public void getCouponInfoByCouponId() {
         // given
-        Long couponId = 1L;
-        List<CouponHistory> historyList = new ArrayList<>();
-        Coupon mockCoupon = new Coupon(couponId, "TEST쿠폰", 1000, 10, historyList);
+        CouponResult result = couponService.registerCoupon("TEST쿠폰", 100, 10);
+        Coupon mockCoupon = new Coupon(result.getId(), result.getCouponName(), result.getQuantity(), result.getQuantity(), result.getBenefitInfo());
 
-        when(couponRepository.findByCouponId(couponId)).thenReturn(mockCoupon);
-
+        when(couponRepository.findByCouponId(result.getId())).thenReturn(mockCoupon);
         // when
-        CouponResult result = couponService.getCouponInfoByCouponId(couponId);
+        CouponResult couponResult = couponService.getCouponInfoByCouponId(result.getId());
 
         // then
-        assertNotNull(result);
-        assertEquals(couponId, result.getId());
-        assertEquals("TEST쿠폰", result.getCouponName());
-        verify(couponRepository, times(1)).findByCouponId(couponId);
+        assertNotNull(couponResult);
+        assertEquals(result.getId(), couponResult.getId());
+        assertEquals("TEST쿠폰", couponResult.getCouponName());
+        verify(couponRepository, times(1)).findByCouponId(result.getId());
     }
 
     @Test
@@ -66,7 +64,7 @@ public class CouponServiceImplTest {
         // given
         Long couponId = 1L;
 
-        when(couponRepository.findByCouponId(couponId)).thenReturn(null);
+        //when(couponRepository.findByCouponId(couponId)).thenReturn(null);
 
         // when & then
         assertThatThrownBy(() -> couponService.getCouponInfoByCouponId(couponId))
@@ -80,9 +78,9 @@ public class CouponServiceImplTest {
         Long couponId = 1L;
         List<CouponHistory> historyList = new ArrayList<>();
 
-        User user = new User(userId, "test", 0, historyList);
-        Coupon mockCoupon = new Coupon(couponId, "TEST쿠폰", 1000, 10, historyList);
-        CouponHistory mockIssuance = new CouponHistory(1L, HistoryType.ISSUE, LocalDateTime.now(), null, user, mockCoupon);
+        User user = new User(userId, "test", 0);
+        Coupon mockCoupon = new Coupon(couponId, "TEST쿠폰", 1000, 1000, 10);
+        CouponHistory mockIssuance = new CouponHistory(1L, HistoryType.ISSUE, LocalDateTime.now(), couponId, userId);
 
         when(userRepository.save(user)).thenReturn(user);
         when(couponRepository.findByCouponIdWithLock(couponId)).thenReturn(mockCoupon);
@@ -122,11 +120,11 @@ public class CouponServiceImplTest {
         Long couponId = 1L;
         List<CouponHistory> historyList = new ArrayList<>();
 
-        User user = new User(userId, "test", 0, historyList);
-        Coupon mockCoupon = new Coupon(1L, "TEST쿠폰1", 1000, 10, historyList);
-        Coupon mockCoupon2 = new Coupon(2L, "TEST쿠폰2", 1000, 10, historyList);
-        CouponHistory history1 = new CouponHistory(1L, HistoryType.ISSUE, LocalDateTime.now(), null, user, mockCoupon);
-        CouponHistory history2 = new CouponHistory(1L, HistoryType.ISSUE, LocalDateTime.now(), null, user, mockCoupon2);
+        User user = new User(userId, "test", 0);
+        Coupon mockCoupon = new Coupon(1L, "TEST쿠폰1", 1000, 1000, 10);
+        Coupon mockCoupon2 = new Coupon(2L, "TEST쿠폰2", 1000, 1000, 10);
+        CouponHistory history1 = new CouponHistory(1L, HistoryType.ISSUE, LocalDateTime.now(), mockCoupon.getId(), userId);
+        CouponHistory history2 = new CouponHistory(1L, HistoryType.ISSUE, LocalDateTime.now(), mockCoupon2.getId(), userId);
 
         when(couponHistoryRepository.findByUserId(userId)).thenReturn(Arrays.asList(history1, history2));
         when(couponRepository.findByCouponId(1L)).thenReturn(mockCoupon);
@@ -144,21 +142,21 @@ public class CouponServiceImplTest {
     }
 
     @Test
-    public void useUserIssuedCoupon() {
+    public void useUserIssuedCoupon() throws CustomException {
         // Given
         Long userId = 1L;
         Long couponId = 100L;
         List<CouponHistory> historyList = new ArrayList<>();
 
-        User user = new User(userId, "test", 0, historyList);
+        User user = new User(userId, "test", 0);
 
-        Coupon mockCoupon = new Coupon(1L, "TEST쿠폰1", 1000, 10, historyList);
-        CouponHistory history1 = new CouponHistory(1L, HistoryType.ISSUE, LocalDateTime.now(), null, user, mockCoupon);
+        Coupon mockCoupon = new Coupon(1L, "TEST쿠폰1", 1000, 1000, 10);
+        CouponHistory history1 = new CouponHistory(1L, HistoryType.ISSUE, LocalDateTime.now(), mockCoupon.getId(), user.getId());
 
         when(couponRepository.findByCouponIdWithLock(couponId)).thenReturn(mockCoupon);
-        when(couponHistoryRepository.findByCouponIdAndUserId(couponId, userId)).thenReturn(history1);
+        when(couponHistoryRepository.findByCouponIdAndUserId(couponId, userId)).thenReturn(List.of(history1));
 
-        CouponHistory savedIssue = new CouponHistory(1L, HistoryType.USE, LocalDateTime.now(), null, user, mockCoupon);
+        CouponHistory savedIssue = new CouponHistory(1L, HistoryType.USE, LocalDateTime.now(), mockCoupon.getId(), user.getId());
         when(couponHistoryRepository.save(any(CouponHistory.class))).thenReturn(savedIssue);
 
         // When
@@ -198,7 +196,7 @@ public class CouponServiceImplTest {
         Long userId = 1L;
         Long couponId = 100L;
         List<CouponHistory> historyList = new ArrayList<>();
-        Coupon mockCoupon = new Coupon(1L, "TEST쿠폰1", 1000, 10, historyList);
+        Coupon mockCoupon = new Coupon(1L, "TEST쿠폰1", 1000, 1000, 10);
 
         when(couponRepository.findByCouponIdWithLock(couponId)).thenReturn(mockCoupon);
         when(couponHistoryRepository.findByCouponIdAndUserId(couponId, userId)).thenReturn(null);

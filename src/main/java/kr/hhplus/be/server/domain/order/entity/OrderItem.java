@@ -20,15 +20,12 @@ public class OrderItem extends BaseEntity {
     @Column(name = "order_item_id", insertable = false, nullable = false)
     private Long id;
     private Long productId;
+    private String productName;
     private int quantity;
+    private double productPrice;
     private Long orderId;
 
-    @ManyToOne
-    private Order order;
-    @ManyToOne
-    private Product product;
-
-    public OrderItem create(Product product, int quantity, Order order) {
+    public static OrderItem create(Product product, int quantity, Order order) {
         if (quantity <= 0) {
             throw new IllegalArgumentException("quantity must be greater than 0");
         }
@@ -40,9 +37,9 @@ public class OrderItem extends BaseEntity {
         }
         return OrderItem.builder()
                 .productId(product.getId())
-                .product(product)
+                .productName(product.getProductName())
                 .quantity(quantity)
-                .order(order)
+                .productPrice(product.getPrice())
                 .orderId(order.getId())
                 .build();
     }
