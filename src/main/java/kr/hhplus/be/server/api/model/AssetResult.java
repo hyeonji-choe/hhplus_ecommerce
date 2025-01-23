@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.io.Serializable;
-import java.util.Map;
 
 @Getter
 @Builder
@@ -21,9 +20,6 @@ public class AssetResult implements Serializable {
 
     @JsonProperty("result")
     private String result;
-
-    @JsonProperty("additionalProperties")
-    private Map<String, String> additionalProperties = null;
 
     public static AssetResult toResult(User user) {
         return AssetResult.builder()

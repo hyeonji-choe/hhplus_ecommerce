@@ -21,8 +21,8 @@ public class CouponHistoryRepositoryImpl implements CouponHistoryRepository {
     }
 
     @Override
-    public CouponHistory findByHisotryIdWithLock(Long historyId) {
-        return couponHistoryJpaRepository.findByHistoryIdWithLock(historyId);
+    public List<CouponHistory> findByHisotryIdWithLock(Long couponId) {
+        return couponHistoryJpaRepository.findByHistoryIdWithLock(couponId);
     }
 
     @Override
@@ -31,7 +31,7 @@ public class CouponHistoryRepositoryImpl implements CouponHistoryRepository {
     }
 
     @Override
-    public CouponHistory findByCouponIdAndUserId(Long couponId, Long userId) {
+    public List<CouponHistory> findByCouponIdAndUserId(Long couponId, Long userId) {
         return couponHistoryJpaRepository.findByCouponIdAndUserId(couponId, userId);
     }
 }

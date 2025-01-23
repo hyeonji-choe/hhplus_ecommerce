@@ -17,7 +17,7 @@ public interface CouponService {
 
     IssueCouponResult issueCoupon(Long couponId, Long userId) throws CustomException;
 
-    IssueCouponResult useUserIssuedCoupon(Long userId, Long couponId);
+    IssueCouponResult useUserIssuedCoupon(Long userId, Long couponId) throws CustomException;
 
     List<IssueCouponResult> userIssuedCoupons(Long userId);
 }

@@ -13,8 +13,8 @@ public interface CouponHistoryJpaRepository extends JpaRepository<CouponHistory,
     List<CouponHistory> findByUserId(Long userId);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("SELECT ch FROM CouponHistory ch where ch.id = :historyId")
-    CouponHistory findByHistoryIdWithLock(Long historyId);
+    @Query("SELECT ch FROM CouponHistory ch where ch.couponId = :couponId")
+    List<CouponHistory> findByHistoryIdWithLock(Long couponId);
 
-    CouponHistory findByCouponIdAndUserId(Long couponId, Long userId);
+    List<CouponHistory> findByCouponIdAndUserId(Long couponId, Long userId);
 }

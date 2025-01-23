@@ -5,7 +5,6 @@ import kr.hhplus.be.server.common.exception.CouponErrorCode;
 import kr.hhplus.be.server.common.exception.CustomException;
 import kr.hhplus.be.server.domain.BaseEntity;
 import kr.hhplus.be.server.domain.coupon.HistoryType;
-import kr.hhplus.be.server.domain.user.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,6 +17,7 @@ import java.time.LocalDateTime;
 @Table(name = "coupon_history")
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class CouponHistory extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,24 +30,18 @@ public class CouponHistory extends BaseEntity {
     @Column(name = "issue_use_date")
     private LocalDateTime issueUseDate;
 
-    @Column(name = "order_id")
-    private Long orderId;
+    @Column(name = "coupon_id")
+    private Long couponId;
 
+    @Column(name = "user_id")
+    private Long userId;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
-
-    @ManyToOne
-    @JoinColumn(name = "coupon_id")
-    private Coupon coupon;
-
-    @Builder
-    public CouponHistory(HistoryType type, LocalDateTime issueUseDate, User user, Coupon coupon) {
-        this.type = type;
-        this.issueUseDate = issueUseDate;
-        this.user = user;
-        this.coupon = coupon;
+    public static CouponHistory create(HistoryType type, LocalDateTime issueUseDate, Long userId, Long couponId) {
+        return CouponHistory.builder()
+                .type(type)
+                .issueUseDate(issueUseDate)
+                .userId(userId)
+                .couponId(couponId).build();
     }
 
     public void checkCoupon() throws CustomException {

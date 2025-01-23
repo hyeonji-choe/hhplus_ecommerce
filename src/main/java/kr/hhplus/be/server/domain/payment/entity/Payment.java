@@ -2,8 +2,6 @@ package kr.hhplus.be.server.domain.payment.entity;
 
 import jakarta.persistence.*;
 import kr.hhplus.be.server.domain.BaseEntity;
-import kr.hhplus.be.server.domain.coupon.entity.CouponHistory;
-import kr.hhplus.be.server.domain.order.entity.Order;
 import kr.hhplus.be.server.domain.payment.PaymentState;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,10 +25,18 @@ public class Payment extends BaseEntity {
     private PaymentState paymentState;
     @Column(name = "order_id")
     private Long orderId;
-    @OneToOne
-    private Order order;
     @Column(name = "coupon_history_id")
     private Long couponHistoryId;
-    @OneToOne
-    private CouponHistory couponHistory;
+
+    public static Payment create(Long toatalPaymentPrice, PaymentState state, Long orderId) {
+        return Payment.builder()
+                .totalPaymentPrice(toatalPaymentPrice)
+                .paymentState(state)
+                .orderId(orderId)
+                .build();
+    }
+
+    public void useCoupon(Long couponHistoryId) {
+        this.couponHistoryId = couponHistoryId;
+    }
 }

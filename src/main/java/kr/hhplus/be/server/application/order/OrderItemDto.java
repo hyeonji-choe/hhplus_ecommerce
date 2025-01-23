@@ -20,8 +20,8 @@ public class OrderItemDto {
                 .orderProductId(orderItem.getProductId())
                 .orderId(orderItem.getOrderId())
                 .productId(orderItem.getProductId())
-                .productName(orderItem.getProduct().getProductName())
-                .productPrice(orderItem.getProduct().getPrice())
+                .productName(orderItem.getProductName())
+                .productPrice(orderItem.getProductPrice())
                 .quantity(orderItem.getQuantity())
                 .build();
     }

@@ -8,9 +8,9 @@ public interface CouponHistoryRepository {
 
     List<CouponHistory> findByUserId(Long userId);
 
-    CouponHistory findByHisotryIdWithLock(Long historyId);
+    List<CouponHistory> findByHisotryIdWithLock(Long couponId);
 
     CouponHistory save(CouponHistory history);
 
-    CouponHistory findByCouponIdAndUserId(Long couponId, Long userId);
+    List<CouponHistory> findByCouponIdAndUserId(Long couponId, Long userId);
 }

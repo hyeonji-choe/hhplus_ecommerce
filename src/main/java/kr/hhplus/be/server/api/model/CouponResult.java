@@ -25,7 +25,7 @@ public class CouponResult implements Serializable {
     private int benefitInfo;
 
     @JsonProperty("quantity")
-    private Long quantity;
+    private int quantity;
 
     public CouponResult id(Long id) {
         this.id = id;
@@ -37,7 +37,7 @@ public class CouponResult implements Serializable {
                 .id(coupon.getId())
                 .couponName(coupon.getCouponName())
                 .benefitInfo(coupon.getDiscountRate())
-                .quantity(coupon.getCouponQuantity())
+                .quantity(coupon.getQuantity())
                 .build();
     }
 }

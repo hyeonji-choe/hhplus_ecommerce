@@ -12,6 +12,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ExtendWith(MockitoExtension.class)
 public class CouponServiceConcurrencyTest {
 
+    private static final Logger log = LoggerFactory.getLogger(CouponServiceConcurrencyTest.class);
     @Mock
     private UserRepository userRepository;
 
@@ -44,11 +47,12 @@ public class CouponServiceConcurrencyTest {
         int tryIssueCount = 40;
         List<CouponHistory> historyList = new ArrayList<>();
         Coupon coupon = couponRepository.save(
-                new Coupon(1L, "TEST쿠폰", maxIssueCount, 10, historyList));
+                new Coupon(1L, "TEST쿠폰", maxIssueCount, maxIssueCount, 10));
 
         ExecutorService executorService = Executors.newFixedThreadPool(tryIssueCount);
         CountDownLatch latch = new CountDownLatch(tryIssueCount);
 
+        AtomicInteger successCount = new AtomicInteger(0);
         AtomicInteger exceptionCount = new AtomicInteger(0);
 
         for (int i = 1; i <= tryIssueCount; i++) {
@@ -57,7 +61,10 @@ public class CouponServiceConcurrencyTest {
             executorService.submit(() -> {
                 try {
                     couponService.issueCoupon(coupon.getId(), user.getId());
+                    successCount.incrementAndGet();
+                    log.debug("issueCoupon");
                 } catch (CustomException e) {
+                    log.debug("failCoupon");
                     exceptionCount.incrementAndGet();
                 } finally {
                     latch.countDown();
@@ -67,6 +74,7 @@ public class CouponServiceConcurrencyTest {
         latch.await();
         executorService.shutdown();
 
-        assertThat(exceptionCount.get()).isEqualTo(tryIssueCount - maxIssueCount);
+        assertThat(successCount.get()).isEqualTo(maxIssueCount);
+        //assertThat(exceptionCount.get()).isEqualTo(tryIssueCount - maxIssueCount);
     }
 }

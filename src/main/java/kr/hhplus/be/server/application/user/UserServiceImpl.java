@@ -34,6 +34,16 @@ public class UserServiceImpl implements UserService {
         return AssetResult.toResult(user);
     }
 
+    @Override
+    public AssetResult useUserAsset(Long userId, Long amount) {
+        User user = userRepository.findByUserIdWithLock(userId);
+        if (ObjectUtils.isEmpty(user)) throw new EntityNotFoundException("User not found.");
+        user.useAsset(amount);
+        userRepository.save(user);
+
+        return AssetResult.toResult(user);
+    }
+
     @Transactional(readOnly = true)
     @Override
     public AssetResult getAssetByUserId(Long userId) {

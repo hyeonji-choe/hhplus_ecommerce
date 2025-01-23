@@ -11,4 +11,6 @@ public interface UserService {
     AssetResult getAssetByUserId(Long userId);
 
     AssetResult chargeUserAsset(Long userId, Long amount);
+
+    AssetResult useUserAsset(Long userId, Long amount);
 }

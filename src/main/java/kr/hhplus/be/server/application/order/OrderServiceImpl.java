@@ -64,11 +64,7 @@ public class OrderServiceImpl implements OrderService {
 
         for (OrderProductServiceRequest request : requests) {
             Product product = productRepository.findByProductIdWithLock(request.getProductId());
-            OrderItem orderItem = OrderItem.builder()
-                    .order(order)
-                    .product(product)
-                    .quantity(request.getQuantity())
-                    .build();
+            OrderItem orderItem = OrderItem.create(product, request.getQuantity(), order);
 
             OrderItem item = orderItemRepository.save(orderItem);
             result.add(item);

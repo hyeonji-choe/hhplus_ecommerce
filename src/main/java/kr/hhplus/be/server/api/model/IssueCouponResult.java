@@ -2,12 +2,12 @@ package kr.hhplus.be.server.api.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import kr.hhplus.be.server.domain.coupon.HistoryType;
+import kr.hhplus.be.server.domain.coupon.entity.Coupon;
 import kr.hhplus.be.server.domain.coupon.entity.CouponHistory;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.io.Serializable;
-import java.util.Map;
 
 /**
  * RegistCouponResult
@@ -35,9 +35,6 @@ public class IssueCouponResult implements Serializable {
     @JsonProperty("result")
     private String result;
 
-    @JsonProperty("additionalProperties")
-    private Map<String, String> additionalProperties = null;
-
     public static IssueCouponResult create(Long historyId, Long couponId, Long userId, String couponName, String result) {
         return IssueCouponResult.builder()
                 .historyId(historyId)
@@ -48,12 +45,12 @@ public class IssueCouponResult implements Serializable {
                 .build();
     }
 
-    public static IssueCouponResult toResult(CouponHistory history) {
+    public static IssueCouponResult toResult(Coupon coupon, CouponHistory history) {
         return IssueCouponResult.builder()
                 .historyId(history.getId())
-                .couponId(history.getCoupon().getId())
-                .userId(history.getUser().getId())
-                .couponName(history.getCoupon().getCouponName())
+                .couponId(history.getCouponId())
+                .userId(history.getUserId())
+                .couponName(coupon.getCouponName())
                 .historyType(history.getType())
                 .build();
     }

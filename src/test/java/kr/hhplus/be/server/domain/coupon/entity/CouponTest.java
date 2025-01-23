@@ -1,11 +1,8 @@
 package kr.hhplus.be.server.domain.coupon.entity;
 
 import kr.hhplus.be.server.common.exception.CustomException;
-import kr.hhplus.be.server.domain.coupon.HistoryType;
-import kr.hhplus.be.server.domain.user.entity.User;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +19,7 @@ public class CouponTest {
         int discountRate = 10;
         List<CouponHistory> historyList = new ArrayList<>();
 
-        Coupon coupon = new Coupon(couponId, name, quantity, discountRate, historyList);
+        Coupon coupon = new Coupon(couponId, name, quantity, quantity, discountRate);
 
         // Assert
         assertThat(coupon).isNotNull()
@@ -33,22 +30,16 @@ public class CouponTest {
     @Test
     public void 쿠폰_발급_성공시_수량1_감소() throws CustomException {
         // Arrange
-        long userId = 1L;
-        long assetAmount = 0;
-        String userName = "testUser";
-        List<CouponHistory> historyList = new ArrayList<>();
-        User user = new User(userId, userName, assetAmount, historyList);
-
         Long couponId = 1L;
         String name = "Test Coupon";
         int quantity = 5;
-        int discountRate = 10;
-        Coupon coupon = new Coupon(couponId, name, quantity, discountRate, historyList);
-
         int expectedQuantity = quantity - 1;
-        coupon.issueCoupon(new CouponHistory(HistoryType.ISSUE, LocalDateTime.now(), user, coupon));
+        int discountRate = 10;
+        Coupon coupon = new Coupon(couponId, name, quantity, quantity, discountRate);
 
-        assertThat(coupon.getCouponQuantity()).isEqualTo(expectedQuantity);
+        coupon.decreaseQuantity();
+
+        assertThat(coupon.getQuantity()).isEqualTo(expectedQuantity);
     }
 
 }
