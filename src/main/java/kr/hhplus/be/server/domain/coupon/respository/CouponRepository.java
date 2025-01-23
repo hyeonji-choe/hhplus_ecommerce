@@ -11,5 +11,7 @@ public interface CouponRepository {
 
     Coupon findByCouponIdWithLock(Long couponId);
 
+    Coupon findByCouponIdWithOptimisticLock(Long couponId);
+
     Coupon save(Coupon coupon);
 }

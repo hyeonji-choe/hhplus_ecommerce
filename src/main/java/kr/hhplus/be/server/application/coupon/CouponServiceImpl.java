@@ -80,6 +80,23 @@ public class CouponServiceImpl implements CouponService {
 
     @Override
     @Transactional
+    public IssueCouponResult issueCouponWithOptimisticLock(Long couponId, Long userId) throws CustomException {
+        User user = userRepository.findByUserIdWithLock(userId);
+        if (user == null) throw new EntityNotFoundException("User not found.");
+
+        Coupon coupon = couponRepository.findByCouponIdWithOptimisticLock(couponId);
+        if (coupon == null) throw new EntityNotFoundException("Coupon not found.");
+
+        Coupon issuedCoupon = couponIssuer.issue(user, coupon);
+
+        couponRepository.save(issuedCoupon);
+        CouponHistory history = couponHistoryRepository.save(CouponHistory.create(HistoryType.ISSUE, LocalDateTime.now(), userId, couponId));
+
+        return IssueCouponResult.create(history.getId(), coupon.getId(), user.getId(), coupon.getCouponName(), "success");
+    }
+
+    @Override
+    @Transactional
     public IssueCouponResult useUserIssuedCoupon(Long userId, Long couponId) throws CustomException {
         Coupon coupon = couponRepository.findByCouponIdWithLock(couponId);
         if (coupon == null) throw new EntityNotFoundException("Coupon not found.");
