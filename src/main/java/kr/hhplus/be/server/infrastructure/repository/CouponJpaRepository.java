@@ -19,4 +19,7 @@ public interface CouponJpaRepository extends JpaRepository<Coupon, Long> {
     @Query("SELECT c from Coupon c where c.id = :couponId")
     Coupon findByCouponIdWithLock(Long couponId);
 
+    @Lock(LockModeType.OPTIMISTIC)
+    @Query("SELECT c from Coupon c where c.id = :couponId")
+    Coupon findByCouponIdWithOptimisticLock(Long couponId);
 }

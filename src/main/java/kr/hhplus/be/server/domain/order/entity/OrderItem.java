@@ -21,11 +21,11 @@ public class OrderItem extends BaseEntity {
     private Long id;
     private Long productId;
     private String productName;
-    private int quantity;
+    private Long quantity;
     private double productPrice;
     private Long orderId;
 
-    public static OrderItem create(Product product, int quantity, Order order) {
+    public static OrderItem create(Product product, Long quantity, Order order) {
         if (quantity <= 0) {
             throw new IllegalArgumentException("quantity must be greater than 0");
         }

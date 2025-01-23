@@ -24,6 +24,7 @@ public class UserServiceImpl implements UserService {
         return UserResult.toResult(user);
     }
 
+    @Transactional
     @Override
     public AssetResult chargeUserAsset(Long userId, Long amount) {
         User user = userRepository.findByUserIdWithLock(userId);
@@ -34,6 +35,7 @@ public class UserServiceImpl implements UserService {
         return AssetResult.toResult(user);
     }
 
+    @Transactional
     @Override
     public AssetResult useUserAsset(Long userId, Long amount) {
         User user = userRepository.findByUserIdWithLock(userId);

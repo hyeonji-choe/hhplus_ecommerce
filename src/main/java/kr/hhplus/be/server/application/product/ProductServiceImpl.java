@@ -45,7 +45,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Transactional
     public ProductResult decreaseStock(Long productId, Long quantity) throws CustomException {
-        Product product = productRepository.findByProductIdWithLock(productId);
+        Product product = productRepository.findByProductId(productId);
         product.decreaseQuantity(quantity);
 
         Product savedStock = productRepository.save(product);
