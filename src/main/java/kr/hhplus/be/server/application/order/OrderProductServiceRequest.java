@@ -12,7 +12,7 @@ public class OrderProductServiceRequest {
     private Long productId;
     private String productName;
     private Long productPrice;
-    private Integer quantity;
+    private Long quantity;
     private Long totalPrice;
 
 }

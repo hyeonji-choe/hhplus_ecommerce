@@ -2,6 +2,7 @@ package kr.hhplus.be.server.application.order;
 
 import jakarta.persistence.EntityNotFoundException;
 import kr.hhplus.be.server.api.model.OrderResult;
+import kr.hhplus.be.server.common.exception.CustomException;
 import kr.hhplus.be.server.domain.order.entity.Order;
 import kr.hhplus.be.server.domain.order.entity.OrderItem;
 import kr.hhplus.be.server.domain.order.repository.OrderItemRepository;
@@ -13,6 +14,7 @@ import kr.hhplus.be.server.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
@@ -56,7 +58,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Transactional
-    public List<OrderItem> createOrderProduct(Long orderId, List<OrderProductServiceRequest> requests) {
+    public List<OrderItem> createOrderProduct(Long orderId, List<OrderProductServiceRequest> requests) throws CustomException {
         List<OrderItem> result = new ArrayList<>();
 
         Order order = orderRepository.findByOrderId(orderId);
@@ -66,10 +68,22 @@ public class OrderServiceImpl implements OrderService {
             Product product = productRepository.findByProductIdWithLock(request.getProductId());
             OrderItem orderItem = OrderItem.create(product, request.getQuantity(), order);
 
+            decreaseStock(product, request.getQuantity());
             OrderItem item = orderItemRepository.save(orderItem);
             result.add(item);
         }
         return result;
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void decreaseStock(Product product, Long quantity) throws CustomException {
+        try {
+            productRepository.getLock(product.getId().toString());
+            product.decreaseQuantity(quantity);
+            productRepository.save(product);
+        } finally {
+            //락 해제
+            productRepository.releaseLock(product.getId().toString());
+        }
+    }
 }
