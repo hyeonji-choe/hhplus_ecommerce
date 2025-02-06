@@ -16,4 +16,6 @@ public interface ProductService {
     ProductResult decreaseStock(Long productId, Long quantity) throws CustomException;
 
     List<FamousProductResult> findTop5OrderProducts();
+
+    void evictTop5Products();
 }
