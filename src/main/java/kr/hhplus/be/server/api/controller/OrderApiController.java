@@ -5,6 +5,7 @@ import kr.hhplus.be.server.api.model.OrderRegist;
 import kr.hhplus.be.server.api.model.OrderResult;
 import kr.hhplus.be.server.application.order.OrderService;
 import kr.hhplus.be.server.application.order.OrderServiceRequest;
+import kr.hhplus.be.server.common.exception.CustomException;
 import kr.hhplus.be.server.domain.order.entity.OrderItem;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ public class OrderApiController implements OrderApi {
     }
 
     @Override
-    public ResponseEntity<List<OrderItem>> registOrderProduct(OrderRegist orderRegist) {
+    public ResponseEntity<List<OrderItem>> registOrderProduct(OrderRegist orderRegist) throws CustomException {
         return ResponseEntity.ok(orderService.createOrderProduct(orderRegist.getOrderId(), orderRegist.getRequests()));
     }
 

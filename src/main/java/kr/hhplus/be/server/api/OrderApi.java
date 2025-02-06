@@ -8,6 +8,7 @@ package kr.hhplus.be.server.api;
 import kr.hhplus.be.server.api.model.OrderRegist;
 import kr.hhplus.be.server.api.model.OrderResult;
 import kr.hhplus.be.server.application.order.OrderServiceRequest;
+import kr.hhplus.be.server.common.exception.CustomException;
 import kr.hhplus.be.server.domain.order.entity.OrderItem;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -49,7 +50,7 @@ public interface OrderApi {
             produces = {"application/json"},
             consumes = {"application/json"}
     )
-    ResponseEntity<List<OrderItem>> registOrderProduct(@RequestBody(required = false) OrderRegist orderRegist);
+    ResponseEntity<List<OrderItem>> registOrderProduct(@RequestBody(required = false) OrderRegist orderRegist) throws CustomException;
 
 
     /**

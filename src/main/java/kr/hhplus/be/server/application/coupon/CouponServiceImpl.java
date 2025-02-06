@@ -35,8 +35,8 @@ public class CouponServiceImpl implements CouponService {
 
     @Override
     public CouponResult registerCoupon(String couponName, int quantity, int discountRate) {
-        Coupon coupon = Coupon.create(couponName, quantity, discountRate);
-        couponRepository.save(coupon);
+        Coupon coupon = couponRepository.save(Coupon.create(couponName, quantity, discountRate));
+        log.debug("coupon_getId " + coupon.getId());
         return CouponResult.toResult(coupon);
     }
 

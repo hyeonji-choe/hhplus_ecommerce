@@ -12,7 +12,7 @@ public class OrderItemDto {
     private Long productId;
     private String productName;
     private Double productPrice;
-    private int quantity;
+    private Long quantity;
     private Long totalPrice;
 
     public static OrderItemDto toDto(OrderItem orderItem) {

@@ -33,7 +33,7 @@ public class OrderItemRepositoryImpl implements OrderItemRepository {
         return orderItemJpaRepository.save(product);
     }
 
-
+    @Override
     public List<TopOrderProduct> findTop5OrderProducts() {
         QOrderItem orderItem = QOrderItem.orderItem;
         LocalDateTime threeDaysAgo = LocalDateTime.now().minusDays(3);

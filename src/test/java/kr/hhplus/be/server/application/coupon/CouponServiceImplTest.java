@@ -12,10 +12,11 @@ import kr.hhplus.be.server.domain.coupon.respository.CouponRepository;
 import kr.hhplus.be.server.domain.user.entity.User;
 import kr.hhplus.be.server.domain.user.repository.UserRepository;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.testcontainers.context.ImportTestcontainers;
+import org.springframework.test.context.ActiveProfiles;
+import org.testcontainers.utility.TestcontainersConfiguration;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -27,19 +28,21 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+@ActiveProfiles("test")
+@ImportTestcontainers(TestcontainersConfiguration.class)
+@SpringBootTest
 public class CouponServiceImplTest {
 
-    @Mock
+    @Autowired
     private UserRepository userRepository;
 
-    @Mock
+    @Autowired
     private CouponRepository couponRepository;
 
-    @Mock
+    @Autowired
     private CouponHistoryRepository couponHistoryRepository;
 
-    @InjectMocks
+    @Autowired
     private CouponServiceImpl couponService;
 
     @Test

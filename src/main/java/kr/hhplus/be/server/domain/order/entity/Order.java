@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@Table(name = "order")
+@Table(name = "order_table")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
