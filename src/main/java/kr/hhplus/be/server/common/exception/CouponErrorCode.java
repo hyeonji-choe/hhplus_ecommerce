@@ -7,7 +7,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum CouponErrorCode implements ErrorCode {
     EMPTY_ISSUE_COUPON("Coupon is empty."),
-    ALREADY_USED_COUPON("The Coupon is already used.");
+    ALREADY_USED_COUPON("The Coupon is already used."),
+    ALREADY_ISSUED("The Coupon is already issued.");
 
     private final String message;
 

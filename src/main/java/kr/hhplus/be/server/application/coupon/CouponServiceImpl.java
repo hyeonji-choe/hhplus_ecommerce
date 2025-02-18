@@ -18,6 +18,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +34,10 @@ public class CouponServiceImpl implements CouponService {
     private final CouponHistoryRepository couponHistoryRepository;
     private final UserRepository userRepository;
     private final CouponIssuer couponIssuer;
+
+    private final RedisTemplate<String, String> redisTemplate;
+    private static final String COUPON_STOCK_KEY = "coupon_stock:";
+    private static final String COUPON_ISSUED_KEY = "coupon_issued:";
 
     @Override
     public CouponResult registerCoupon(String couponName, int quantity, int discountRate) {
@@ -64,16 +70,37 @@ public class CouponServiceImpl implements CouponService {
     @Override
     @Transactional
     public IssueCouponResult issueCoupon(Long couponId, Long userId) throws CustomException {
-        User user = userRepository.findByUserIdWithLock(userId);
-        if (user == null) throw new EntityNotFoundException("User not found.");
+        String stockKey = COUPON_STOCK_KEY + couponId;
+        String issuedKey = COUPON_ISSUED_KEY + couponId;
 
-        Coupon coupon = couponRepository.findByCouponIdWithLock(couponId);
+        // 1️⃣ Check if the user already got a coupon (Prevent duplicate issuance)
+        Boolean alreadyIssued = redisTemplate.opsForSet().isMember(issuedKey, userId.toString());
+        if (Boolean.TRUE.equals(alreadyIssued)) {
+            throw new CustomException(CouponErrorCode.ALREADY_ISSUED);
+        }
+        // 2️⃣ Attempt to decrement stock atomically
+        Long stock = redisTemplate.opsForValue().decrement(stockKey);
+        if (stock == null || stock < 0) {
+            redisTemplate.opsForValue().increment(stockKey); // Restore count if failed
+            throw new CustomException(CouponErrorCode.EMPTY_ISSUE_COUPON);
+        }
+
+        // 3️⃣ Add user to issued set
+        redisTemplate.opsForSet().add(issuedKey, userId.toString());
+
+        // 4️⃣ Persist to DB asynchronously (Best-effort)
+        return saveIssuedCouponToDB(couponId, userId);
+    }
+
+    @Async
+    public IssueCouponResult saveIssuedCouponToDB(Long couponId, Long userId) {
+        User user = userRepository.findByUserId(userId);
+        if (user == null) throw new EntityNotFoundException("User not found.");
+        Coupon coupon = couponRepository.findByCouponId(couponId);
         if (coupon == null) throw new EntityNotFoundException("Coupon not found.");
 
-        Coupon issuedCoupon = couponIssuer.issue(user, coupon);
-
-        couponRepository.save(issuedCoupon);
-        CouponHistory history = couponHistoryRepository.save(CouponHistory.create(HistoryType.ISSUE, LocalDateTime.now(), userId, couponId));
+        CouponHistory history = CouponHistory.create(HistoryType.ISSUE, LocalDateTime.now(), userId, couponId);
+        couponHistoryRepository.save(history);
 
         return IssueCouponResult.create(history.getId(), coupon.getId(), user.getId(), coupon.getCouponName(), "success");
     }
