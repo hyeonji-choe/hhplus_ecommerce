@@ -9,9 +9,12 @@ import kr.hhplus.be.server.domain.order.repository.OrderItemRepository;
 import kr.hhplus.be.server.domain.product.entity.Product;
 import kr.hhplus.be.server.domain.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
@@ -53,6 +56,7 @@ public class ProductServiceImpl implements ProductService {
         return ProductResult.toResult(savedStock);
     }
 
+    @Cacheable("POPULAR_ITEM")
     @Transactional(readOnly = true)
     public List<FamousProductResult> findTop5OrderProducts() {
         List<TopOrderProduct> topOrderProductList = orderItemRepository.findTop5OrderProducts();
@@ -61,5 +65,10 @@ public class ProductServiceImpl implements ProductService {
             Product product = productRepository.findByProductId(p.getProductId());
             return FamousProductResult.toResult(product, p.getTotalQuantity());
         }).toList();
+    }
+
+    @Scheduled(cron = "0 0 0 * * *")
+    @CacheEvict("POPULAR_ITEM")
+    public void evictTop5Products() {
     }
 }
