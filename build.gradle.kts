@@ -59,6 +59,9 @@ dependencies {
 	annotationProcessor ("com.querydsl:querydsl-apt:5.0.0:jakarta")
 	annotationProcessor ("jakarta.annotation:jakarta.annotation-api")
 	annotationProcessor ("jakarta.persistence:jakarta.persistence-api")
+
+	// Kafka
+	implementation("org.springframework.kafka:spring-kafka")
 }
 
 tasks.withType<Test> {
