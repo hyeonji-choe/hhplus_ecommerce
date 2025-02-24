@@ -12,4 +12,7 @@ step08/09 에서 api 완성도를 높이는 것이 목표였으나 아직 부족
 테스트 코드 완성도 또한 좋게 만들어야할것같음. 
 
 ## 동시성 제어 방식 분석
-[블로그 분석글 이동](https://programmer.emmawebsite.com/entry/DB%EB%9D%BD-%ED%99%9C%EC%9A%A9-Ecommerce-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%EB%8F%99%EC%8B%9C%EC%84%B1-%EC%A0%9C%EC%96%B4%EC%99%80-%ED%85%8C%EC%8A%A4%ED%8A%B8)
+[DB락-활용-Ecommerce-프로젝트-동시성-제어와-테스트](https://programmer.emmawebsite.com/entry/DB%EB%9D%BD-%ED%99%9C%EC%9A%A9-Ecommerce-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%EB%8F%99%EC%8B%9C%EC%84%B1-%EC%A0%9C%EC%96%B4%EC%99%80-%ED%85%8C%EC%8A%A4%ED%8A%B8)
+
+## 카프카 학습 내용 정리
+[Kafka-kafka란-docker-Spring-연동](https://programmer.emmawebsite.com/entry/Kafka-kafka%EB%9E%80-docker-Spring-%EC%97%B0%EB%8F%99)
